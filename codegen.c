@@ -869,12 +869,12 @@ static void gen_expr(Node *node) {
     int c = count();
     gen_expr(node->cond);
     cmp_zero(node->cond->ty);
-    println("  je .L.else.%d", c);
+    println("\tbeq\t0\t1\telse.%d", c);
     gen_expr(node->then);
-    println("  jmp .L.end.%d", c);
-    println(".L.else.%d", c);
+    println("\tbeq\t0\t0\tend.%d", c);
+    print("else.%d", c);
     gen_expr(node->els);
-    println(".L.end.%d", c);
+    println("end.%d\tnoop", c);
     return;
   }
   case ND_NOT:
@@ -1146,8 +1146,17 @@ static void gen_expr(Node *node) {
     println("\tadd\t%s\t%s\t%s", di, ax, ax);
     return;
   case ND_MUL:
-    unreachable();  // not implimented
-    println("  imul %s, %s", di, ax);
+    println("\tadd\t1\t0\t2\tmul");
+    println("\tadd\t0\t0\t1");
+    println("\tlw\t0\t3\ti..%d", new_imme(1));
+    println("\tnor\t6\t0\t7");
+    println("\tnor\t7\t3\t7");
+    println("\tbeq\t7\t6\t1");
+    println("\tadd\t2\t1\t1");
+    println("\tadd\t2\t2\t2");
+    println("\tadd\t3\t3\t3");
+    println("\tbeq\t0\t3\t1");
+    println("\tbeq\t0\t0\t-8\tmul end");
     return;
   case ND_DIV:
   case ND_MOD:

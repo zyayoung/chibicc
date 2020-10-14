@@ -11,11 +11,13 @@ The compiler chibicc-lc2k is underdeveloped, designed features includes
   - [x] sub
   - [x] eq
   - [x] neq
-  - [ ] mul
+  - [x] mul
   - [ ] div
   - [ ] mod
   - [ ] le
+  - [ ] leq
   - [ ] ge
+  - [ ] geq
   - [ ] bit_or
   - [ ] bit_and
   - [ ] bit_xor
@@ -24,6 +26,7 @@ The compiler chibicc-lc2k is underdeveloped, designed features includes
   - [x] shortcut || &&
   - [x] if ... else ...
   - [x] while /for loop
+  - [x] ? :
   - [ ] do while
 
 
