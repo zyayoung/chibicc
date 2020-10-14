@@ -735,7 +735,7 @@ int main(int argc, char **argv) {
     if (opt_o)
       output = opt_o;
     else if (opt_S)
-      output = replace_extn(input, ".s");
+      output = replace_extn(input, ".as");
     else
       output = replace_extn(input, ".o");
 

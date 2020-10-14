@@ -334,6 +334,7 @@ static Obj *new_anon_gvar(Type *ty) {
 }
 
 static Obj *new_string_literal(char *p, Type *ty) {
+  assert(false);  // lc2k don't support bytes
   Obj *var = new_anon_gvar(ty);
   var->init_data = p;
   return var;
@@ -3247,12 +3248,12 @@ static Token *function(Token *tok, Type *basety, VarAttr *attr) {
   // [https://www.sigbus.info/n1570#6.4.2.2p1] "__func__" is
   // automatically defined as a local variable containing the
   // current function name.
-  push_scope("__func__")->var =
-    new_string_literal(fn->name, array_of(ty_char, strlen(fn->name) + 1));
+  // push_scope("__func__")->var =
+  //   new_string_literal(fn->name, array_of(ty_char, strlen(fn->name) + 1));
 
-  // [GNU] __FUNCTION__ is yet another name of __func__.
-  push_scope("__FUNCTION__")->var =
-    new_string_literal(fn->name, array_of(ty_char, strlen(fn->name) + 1));
+  // // [GNU] __FUNCTION__ is yet another name of __func__.
+  // push_scope("__FUNCTION__")->var =
+  //   new_string_literal(fn->name, array_of(ty_char, strlen(fn->name) + 1));
 
   fn->body = compound_stmt(&tok, tok);
   fn->locals = locals;

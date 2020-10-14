@@ -8,3 +8,10 @@
 /chibicc
 /test/*.exe
 /stage2
+*.out
+*.as
+*.mc
+assembler
+linker
+simulator
+test.sh

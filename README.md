@@ -1,4 +1,40 @@
-# chibicc: A Small C Compiler
+# chibicc-lc2k: A Small C Compiler for LC-2K (Little Computer 2000)
+
+## Status
+
+The compiler chibicc-lc2k is underdeveloped, designed features includes
+- Function call
+- Datatype 
+  - [x] int
+- Operation 
+  - [x] add
+  - [x] sub
+  - [x] eq
+  - [x] neq
+  - [ ] mul
+  - [ ] div
+  - [ ] mod
+  - [ ] le
+  - [ ] ge
+  - [ ] bit_or
+  - [ ] bit_and
+  - [ ] bit_xor
+  - [ ] bit_shift
+- Control flow
+  - [x] shortcut || &&
+  - [x] if ... else ...
+  - [x] while /for loop
+  - [ ] do while
+
+
+## Example:
+
+```bash
+make
+./chibicc lc2k/test.c -S
+```
+
+## chibicc: A Small C Compiler
 
 (The old master has moved to
 [historical/old](https://github.com/rui314/chibicc/tree/historical/old)
@@ -52,7 +88,7 @@ notification when a free chapter is available online or the book is published.
 I pronounce chibicc as _chee bee cee cee_. "chibi" means "mini" or
 "small" in Japanese. "cc" stands for C compiler.
 
-## Status
+### Status
 
 Features that are often missing in a small compiler but supported by
 chibicc include (but not limited to):
@@ -67,6 +103,8 @@ chibicc include (but not limited to):
 - Common symbol
 - Designated initializer
 - L, u, U and u8 string literals
+
+**These features are not supported by chibicc-lc2k.**
 
 chibicc does not support digraphs, trigraphs, complex numbers, K&R-style
 function prototype, and inline assembly.
@@ -83,7 +121,7 @@ few small changes so that chibicc works on Ubuntu 18.04, Fedora 32 and
 Gentoo 2.6, but portability is not my goal at this moment. It may or
 may not work on systems other than Ubuntu 20.04.
 
-## Internals
+### Internals
 
 chibicc consists of the following stages:
 
@@ -100,25 +138,7 @@ chibicc consists of the following stages:
 
 - Codegen: A code generator emits an assembly text for given AST nodes.
 
-## Contributing
-
-When I find a bug in this compiler, I go back to the original commit that
-introduced the bug and rewrite the commit history as if there were no such
-bug from the beginning. This is an unusual way of fixing bugs, but as a
-part of a book, it is important to keep every commit bug-free.
-
-Thus, I do not take pull requests in this repo. You can send me a pull
-request if you find a bug, but it is very likely that I will read your
-patch and then apply that to my previous commits by rewriting history. I'll
-credit your name somewhere, but your changes will be rewritten by me before
-submitted to this repository.
-
-Also, please assume that I will occasionally force-push my local repository
-to this public one to rewrite history. If you clone this project and make
-local commits on top of it, your changes will have to be rebased by hand
-when I force-push new commits.
-
-## Design principles
+### Design principles
 
 chibicc's core value is its simplicity and the reability of its source
 code. To achieve this goal, I was careful not to be too clever when
@@ -126,7 +146,7 @@ writing code. Let me explain what that means.
 
 Oftentimes, as you get used to the code base, you are tempted to
 _improve_ the code using more abstractions and clever tricks.
-But that kind of _improvements_ don't always improve readability for
+But that kind of _improvements_ doesn't always improve readability for
 first-time readers and can actually hurts it. I tried to avoid the
 pitfall as much as possible. I wrote this code not for me but for
 first-time readers.
@@ -170,7 +190,7 @@ though). Here is a few notable examples:
   DMD, a compiler for the D language, uses the same memory management
   scheme for the same reason, for example [1].
 
-## About the Author
+### About the Author of chibicc
 
 I'm Rui Ueyama. I'm the creator of [8cc](https://github.com/rui314/8cc),
 which is a hobby C compiler, and also the original creator of the current
