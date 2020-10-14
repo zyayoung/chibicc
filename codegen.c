@@ -1214,12 +1214,13 @@ static void gen_expr(Node *node) {
       println("\tadd\t0\t6\t1");
     return;
   case ND_BITAND:
-    unreachable();  // not implimented
-    println("  and %s, %s", di, ax);
+    println("\tnor\t%s\t0\t%s", ax, ax);
+    println("\tnor\t%s\t0\t%s", di, di);
+    println("\tnor\t%s\t%s\t%s", di, ax, ax);
     return;
   case ND_BITOR:
-    unreachable();  // not implimented
-    println("  or %s, %s", di, ax);
+    println("\tnor\t%s\t%s\t%s", di, ax, ax);
+    println("\tnor\t%s\t0\t%s", ax, ax);
     return;
   case ND_BITXOR:
     unreachable();  // not implimented

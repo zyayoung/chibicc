@@ -12,14 +12,14 @@ The compiler chibicc-lc2k is underdeveloped, designed features includes
   - [x] eq
   - [x] neq
   - [x] mul
-  - [ ] div
-  - [ ] mod
+  - [x] div
+  - [x] mod
   - [ ] le
   - [ ] leq
   - [ ] ge
   - [ ] geq
-  - [ ] bit_or
-  - [ ] bit_and
+  - [x] bit_or
+  - [x] bit_and
   - [ ] bit_xor
   - [ ] bit_shift
 - Control flow
