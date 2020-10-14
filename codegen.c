@@ -181,7 +181,7 @@ static void gen_addr(Node *node) {
         // println("  lea %s(%%rip), %%rax", node->var->name);
         println("\tlw\t0\t4\tA.%s", node->var->name);
       else
-        println("  mov %s@GOTPCREL(%%rip), %%rax", node->var->name);
+        println("\tlw\t0\t4\tA.%s", node->var->name);
       return;
     }
 
@@ -1464,9 +1464,11 @@ static void assign_lvar_offsets(Obj *prog) {
 
 static void emit_data(Obj *prog) {
   for (Obj *var = prog; var; var = var->next) {
-    if(var->is_function){
+    if(var->is_function && var->is_definition){
       print("A.%s", var->name);
       println("\t.fill\t%s", var->name);
+      if (!strcmp(var->name, "main"))
+        println("s_ptr\t.fill\tStack");
     }
     if (var->is_function || !var->is_definition)
       continue;
@@ -1522,6 +1524,8 @@ static void emit_text(Obj *prog) {
     current_fn = fn;
 
     // Prologue
+    if(!strcmp(fn->name, "main"))
+      println("\tlw\t0\t5\ts_ptr\tload stack ptr");
     println("\tsw\t5\t7\t0\tsave return addr");
     println("\tlw\t0\t6\ti..%d\tincrement sp", new_imme(1+fn->stack_size));
     println("\tadd\t5\t6\t5");
@@ -1614,7 +1618,10 @@ static void emit_text(Obj *prog) {
     println("\tadd\t5\t6\t5");
     println("\tadd\t5\t0\t4\tupdate stack base");
     println("\tlw\t5\t7\t0\tload return addr");
-    println("\tjalr\t7\t6\t\tret");
+    if(!strcmp(fn->name, "main"))
+      println("\thalt");
+    else
+      println("\tjalr\t7\t6\t\tret");
   }
 }
 

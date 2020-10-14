@@ -14,5 +14,4 @@
 assembler
 linker
 simulator
-test.sh
 utils
