@@ -698,6 +698,63 @@ static void copy_struct_mem(void) {
   }
 }
 
+static void emit_soft_mul(void) {
+  println("\tadd\t1\t0\t2\tmul");
+  println("\tadd\t0\t0\t1");
+  println("\tlw\t0\t3\ti..%d", new_imme(1));
+  println("\tnor\t6\t0\t7");
+  println("\tnor\t7\t3\t7");
+  println("\tbeq\t7\t6\t1");
+  println("\tadd\t2\t1\t1");
+  println("\tadd\t2\t2\t2");
+  println("\tadd\t3\t3\t3");
+  println("\tbeq\t0\t3\t1");
+  println("\tbeq\t0\t0\t-8\tmul end");
+}
+
+static void emit_soft_div(void) {
+  println("\tadd\t6\t0\t2\tdiv");
+  println("\tadd\t1\t0\t6\t");
+  println("\tlw\t0\t3\ti..%d", new_imme(1));
+  println("\tlw\t0\t1\ti..%d", new_imme(0x7fffffff));
+  println("\tnor\t6\t0\t6\tr6 = -r6 - 1");
+  
+  // push
+  println("\tsw\t5\t2\t0\tpush r2 mtp of divisor");
+  println("\tsw\t5\t3\t1\tpush r3 mtp of unit");
+  println("\tlw\t0\t7\ti..%d", new_imme(2));
+  println("\tadd\t5\t7\t5\tinc stack p");
+  println("\tadd\t2\t2\t2\tr2 <<= 1");
+  println("\tadd\t3\t3\t3\tr3 <<= 1");
+  println("\tadd\t2\t6\t7\tr7 = r2 + r6");
+  println("\tnor\t7\t1\t7\tr7 = r7 >= 0");
+  println("\tbeq\t0\t7\t-9\tb if r7 < 0 i.e. 2kr2 < r6");
+
+
+  println("\tadd\t0\t0\t1\treset ans - r1");
+  //pop
+  println("\tlw\t0\t7\ti..%d", new_imme(-2));
+  println("\tadd\t5\t7\t5\tdec stack p");
+  println("\tlw\t5\t2\t0\tpush r2 mtp of divisor");
+  println("\tlw\t5\t3\t1\tpush r3 mtp of unit");
+
+  //inner loop
+  println("\tadd\t2\t6\t2\ttry add 2kb to r2");
+  println("\tlw\t0\t7\ti..%d", new_imme(0x7fffffff));
+  println("\tnor\t7\t2\t7\tr7 = r2 >= 0");
+  println("\tbeq\t0\t7\t1\tb if r2 < 0");
+  println("\tbeq\t0\t0\t2");
+  println("\tadd\t0\t2\t6\tapply sub");
+  println("\tadd\t1\t3\t1\tans += r3");
+
+
+  println("\tlw\t0\t7\ti..%d", new_imme(1));
+  println("\tbeq\t3\t7\t1");
+  println("\tbeq\t0\t0\t-14");
+
+  println("\tnor\t6\t0\t6\tdiv end");
+}
+
 static void builtin_alloca(void) {
   // Align size to 16 bytes.
   println("  add $15, %%rdi");
@@ -1146,34 +1203,15 @@ static void gen_expr(Node *node) {
     println("\tadd\t%s\t%s\t%s", di, ax, ax);
     return;
   case ND_MUL:
-    println("\tadd\t1\t0\t2\tmul");
-    println("\tadd\t0\t0\t1");
-    println("\tlw\t0\t3\ti..%d", new_imme(1));
-    println("\tnor\t6\t0\t7");
-    println("\tnor\t7\t3\t7");
-    println("\tbeq\t7\t6\t1");
-    println("\tadd\t2\t1\t1");
-    println("\tadd\t2\t2\t2");
-    println("\tadd\t3\t3\t3");
-    println("\tbeq\t0\t3\t1");
-    println("\tbeq\t0\t0\t-8\tmul end");
+    emit_soft_mul();
     return;
   case ND_DIV:
   case ND_MOD:
-    unreachable();  // not implimented
-    if (node->ty->is_unsigned) {
-      println("  mov $0, %s", dx);
-      println("  div %s", di);
-    } else {
-      if (node->lhs->ty->size == 8)
-        println("  cqo");
-      else
-        println("  cdq");
-      println("  idiv %s", di);
-    }
+    // TODO: check sign
+    emit_soft_div();
 
     if (node->kind == ND_MOD)
-      println("  mov %%rdx, %%rax");
+      println("\tadd\t0\t6\t1");
     return;
   case ND_BITAND:
     unreachable();  // not implimented
