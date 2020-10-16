@@ -6,6 +6,9 @@ The compiler chibicc-lc2k is underdeveloped, designed features includes
 - Function call
 - Datatype 
   - [x] int
+  - [x] int array
+  - [x] ptr
+  - [ ] vla
 - Operation 
   - [x] add
   - [x] sub
@@ -14,10 +17,10 @@ The compiler chibicc-lc2k is underdeveloped, designed features includes
   - [x] mul
   - [x] div
   - [x] mod
-  - [ ] le
-  - [ ] leq
-  - [ ] ge
-  - [ ] geq
+  - [x] le
+  - [x] leq
+  - [x] ge
+  - [x] geq
   - [x] bit_or
   - [x] bit_and
   - [ ] bit_xor

@@ -215,8 +215,6 @@ static void gen_addr(Node *node) {
 
 // Load a value from where %rax is pointing to.
 static void load(Type *ty) {
-  println("\tlw\t1\t1\t0\tdereference r1");
-  return;
   switch (ty->kind) {
   case TY_ARRAY:
   case TY_STRUCT:
@@ -241,6 +239,9 @@ static void load(Type *ty) {
     return;
   }
 
+  println("\tlw\t1\t1\t0\tdereference r1");
+  return;
+  
   char *insn = ty->is_unsigned ? "movz" : "movs";
 
   // When we load a char or a short value to a register, we always
@@ -328,6 +329,7 @@ static int getTypeId(Type *ty) {
   case TY_SHORT:
     return ty->is_unsigned ? U16 : I16;
   case TY_INT:
+  case TY_PTR:
     return ty->is_unsigned ? U32 : I32;
   case TY_LONG:
     return ty->is_unsigned ? U64 : I64;
@@ -426,6 +428,7 @@ static char *cast_table[][11] = {
 };
 
 static void cast(Type *from, Type *to) {
+  // return;  // not supported
   if (to->kind == TY_VOID)
     return;
 
@@ -1244,17 +1247,17 @@ static void gen_expr(Node *node) {
       println("\tbeq\t0\t0\t1");
       println("\tadd\t0\t0\t1");
     } else if (node->kind == ND_LT) {
-      unreachable();  // not implimented
-      if (node->lhs->ty->is_unsigned)
-        println("  setb %%al");
-      else
-        println("  setl %%al");
+      println("\tnor\t1\t0\t1");
+      println("\tadd\t6\t1\t6");
+      println("\tlw\t0\t1\ti..%d", new_imme(0x7fffffff));
+      println("\tnor\t6\t1\t1");
     } else if (node->kind == ND_LE) {
-      unreachable();  // not implimented
-      if (node->lhs->ty->is_unsigned)
-        println("  setbe %%al");
-      else
-        println("  setle %%al");
+      println("\tnor\t1\t0\t1");
+      println("\tadd\t6\t1\t6");
+      println("\tlw\t0\t1\ti..%d", new_imme(1));
+      println("\tadd\t6\t1\t6");
+      println("\tlw\t0\t1\ti..%d", new_imme(0x7fffffff));
+      println("\tnor\t6\t1\t1");
     }
 
     // println("  movzb %%al, %%rax");
@@ -1481,10 +1484,12 @@ static void emit_data(Obj *prog) {
 
     // .data or .tdata
     if (var->init_data) {
-      print("%s", var->name);
-      println("\t.fill\t%d", *var->init_data);
       print("G.%s", var->name);
       println("\t.fill\t%s", var->name);
+      print("%s", var->name);
+      for (int pos=0; pos < var->ty->size; pos += 4) {
+        println("\t.fill\t%d", *(int *)(var->init_data + pos));
+      }
     }
   }
 }
